@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  webpage:
+    container_name: dankvizu-website
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "26509:80"

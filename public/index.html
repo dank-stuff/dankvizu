@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>DankVizu</title>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="DankVizu" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Let the frog (aka Mr. Frok) sing.</p>
+    <button onclick="handleStart()">START</button>
+    <button onclick="handleStop()">STOP</button>
+    <button onclick="handlePlay()">JUST PLAY</button>
+    <form action="#" id="file-form">
+      <input
+        name="file_url"
+        type="text"
+        placeholder="Add a song URL to visualize"
+      />
+      <input type="submit" value="Add Song" />
+    </form>
+    <div class="loading-container">
+      <label for="loading-bar">Loading Progress:</label>
+      <progress id="loading-bar" value="0" max="100"></progress>
+      <span id="percent-txt">0%</span>
+    </div>
+    <div>
+      <img width="720" id="mr-frok" src="/mr_frok_mouth_closed.png" />
+      <img
+        hidden
+        class="display: none;"
+        width="720"
+        src="/mr_frok_mouth_opened.png"
+      />
+    </div>
+    <audio id="muziker" preload="auto" muted crossorigin="anonymous"></audio>
+    <script crossorigin="anonymous" src="/script.js"></script>
+    <script>
+      const UPDATE_INTERVAL = 1000 / 69;
+
+      const muziker = document.getElementById("muziker");
+      const fileForm = document.getElementById("file-form");
+      const loadingBar = document.getElementById("loading-bar");
+      const percentText = document.getElementById("percent-txt");
+
+      const dankVizu = new DankVizualizer(muziker, UPDATE_INTERVAL);
+
+      function handleStart() {
+        muziker.muted = null;
+        muziker.volume = 1;
+        dankVizu.runLoop();
+      }
+
+      function handleStop() {
+        muziker.pause();
+        dankVizu.stopLoop();
+      }
+
+      function handlePlay() {
+        muziker.muted = null;
+        muziker.volume = 1;
+        muziker.play();
+      }
+
+      function changeAudioSource(newSrc) {
+        muziker.src = newSrc;
+        loadingBar.value = 0;
+        percentText.innerText = "0%";
+
+        muziker.load();
+      }
+
+      changeAudioSource(
+        "https://cdn.dankmuzikk.com/muzikkx-raw/unfzfe8f9NI.mp3",
+      );
+
+      fileForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        changeAudioSource(fileForm.file_url.value);
+      });
+
+      muziker.addEventListener("canplaythrough", () => {
+        console.log("Finished loading! Ready to play.");
+      });
+
+      muziker.addEventListener("loadstart", () => {
+        console.log("Download started...");
+        loadingBar.value = 0;
+        percentText.innerText = "0%";
+      });
+
+      muziker.addEventListener("progress", () => {
+        if (muziker.duration > 0) {
+          const bufferedEnd = muziker.buffered.end(muziker.buffered.length - 1);
+          const duration = muziker.duration;
+
+          const percent = Math.round((bufferedEnd / duration) * 100);
+
+          loadingBar.value = percent;
+          percentText.innerText = `${percent}%`;
+
+          console.log(`Loading: ${percent}%`);
+        }
+      });
+    </script>
+  </body>
+</html>
