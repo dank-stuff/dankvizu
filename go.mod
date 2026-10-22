@@ -1,3 +1,3 @@
 module github.com/dank-stuff/dankvizu
 
-go 1.25
+go 1.27.3
